@@ -41,7 +41,10 @@ function SurahReader() {
 
   // Remember last opened surah so the Read tab can resume here.
   useEffect(() => {
-    if (Number.isFinite(surahNum)) setSetting("lastSurah", surahNum);
+    if (Number.isFinite(surahNum)) {
+      setSetting("lastSurah", surahNum);
+      setSetting("lastReadMode", "surah");
+    }
   }, [surahNum, setSetting]);
 
 

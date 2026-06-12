@@ -7,6 +7,7 @@ import { useSettings } from "@/stores/settings";
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lastSurah = useSettings((s) => s.lastSurah);
+  const lastReadMode = useSettings((s) => s.lastReadMode);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -20,7 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <ul className="mx-auto flex max-w-2xl items-stretch justify-around px-2">
           <NavItem to="/" label="Home" Icon={Home} active={pathname === "/"} />
-          {lastSurah ? (
+          {lastReadMode === "surah" && lastSurah ? (
             <NavItem
               to="/read/$surah"
               params={{ surah: String(lastSurah) }}

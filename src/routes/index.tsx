@@ -88,6 +88,7 @@ function Dashboard() {
   const pct = ((memorized / TOTAL_VERSES) * 100).toFixed(2);
 
   const userName = useSettings((s) => s.userName).trim();
+  const prayerEnabled = useSettings((s) => s.prayerEnabled);
   const setSetting = useSettings((s) => s.set);
   const prayerLocation = useGeolocate();
   const prayerQ = usePrayerTimes();
@@ -114,56 +115,82 @@ function Dashboard() {
         </figure>
       </header>
 
-      {(hijri || nextPrayer || !prayerLocation) && (
-        <section className="card-petal flex flex-wrap items-center justify-between gap-3 rounded-3xl p-4">
+      <section className="card-petal rounded-3xl p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary">
               <Moon className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              {hijri ? (
+              {prayerEnabled && hijri ? (
                 <p className="text-sm font-semibold">
                   {hijri.day} {hijri.month.en} {hijri.year} AH
                 </p>
-              ) : (
+              ) : prayerEnabled ? (
                 <p className="text-sm font-semibold">Today</p>
-              )}
-              {nextPrayer ? (
-                <p className="text-xs text-muted-foreground">
-                  Next: <span className="font-semibold text-primary">{nextPrayer.name}</span> at{" "}
-                  {nextPrayer.time}
-                  {nextPrayer.minutesUntil < 120 && ` · in ${nextPrayer.minutesUntil}m`}
-                </p>
-              ) : prayerQ.isLoading ? (
-                <p className="text-xs text-muted-foreground">Loading prayer times…</p>
-              ) : !prayerLocation ? (
-                <p className="text-xs text-muted-foreground">
-                  Allow location for prayer times.
-                </p>
               ) : (
-                <p className="text-xs text-muted-foreground">All prayers done for today.</p>
+                <p className="text-sm font-semibold">Prayer times</p>
+              )}
+              {prayerEnabled ? (
+                nextPrayer ? (
+                  <p className="text-xs text-muted-foreground">
+                    Next: <span className="font-semibold text-primary">{nextPrayer.name}</span> at {nextPrayer.time}
+                    {nextPrayer.minutesUntil < 120 && ` · in ${nextPrayer.minutesUntil}m`}
+                  </p>
+                ) : prayerQ.isLoading ? (
+                  <p className="text-xs text-muted-foreground">Loading prayer times…</p>
+                ) : prayerLocation ? (
+                  <p className="text-xs text-muted-foreground">All prayers done for today.</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Location is needed to show prayer times.</p>
+                )
+              ) : (
+                <p className="text-xs text-muted-foreground">Turn this on when you want live prayer times.</p>
               )}
             </div>
           </div>
-          {!prayerLocation && typeof navigator !== "undefined" && (
+          {prayerEnabled ? (
+            !prayerLocation && typeof navigator !== "undefined" && (
+              <button
+                onClick={() => {
+                  if (!navigator.geolocation) return;
+                  navigator.geolocation.getCurrentPosition(
+                    (pos) =>
+                      setSetting("prayerLocation", {
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude,
+                      }),
+                    () => {},
+                    { enableHighAccuracy: false, maximumAge: 1000 * 60 * 60 * 24, timeout: 8000 },
+                  );
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+              >
+                <MapPin className="h-3.5 w-3.5" /> Use my location
+              </button>
+            )
+          ) : (
             <button
               onClick={() => {
-                navigator.geolocation?.getCurrentPosition(
+                setSetting("prayerEnabled", true);
+                if (!navigator.geolocation) return;
+                navigator.geolocation.getCurrentPosition(
                   (pos) =>
                     setSetting("prayerLocation", {
                       lat: pos.coords.latitude,
                       lon: pos.coords.longitude,
                     }),
-                  () => {},
+                  () => setSetting("prayerEnabled", false),
+                  { enableHighAccuracy: false, maximumAge: 1000 * 60 * 60 * 24, timeout: 8000 },
                 );
               }}
               className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
             >
-              <MapPin className="h-3.5 w-3.5" /> Enable
+              <MapPin className="h-3.5 w-3.5" /> Enable prayer times
             </button>
           )}
-        </section>
-      )}
+        </div>
+      </section>
 
 
       <section className="grid grid-cols-2 gap-3">

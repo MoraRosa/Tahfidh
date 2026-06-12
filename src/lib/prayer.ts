@@ -1,6 +1,5 @@
 // Prayer times + Hijri date from the Aladhan API. Geolocates via browser.
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { useSettings } from "@/stores/settings";
 
 interface AladhanResponse {
@@ -31,27 +30,7 @@ export interface NextPrayer {
 }
 
 export function useGeolocate() {
-  const loc = useSettings((s) => s.prayerLocation);
-  const setSetting = useSettings((s) => s.set);
-
-  useEffect(() => {
-    if (loc) return;
-    if (typeof navigator === "undefined" || !navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setSetting("prayerLocation", {
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-        });
-      },
-      () => {
-        // silently ignore — user can set manually later
-      },
-      { enableHighAccuracy: false, maximumAge: 1000 * 60 * 60 * 24, timeout: 8000 },
-    );
-  }, [loc, setSetting]);
-
-  return loc;
+  return useSettings((s) => s.prayerLocation);
 }
 
 function todayDDMMYYYY() {
@@ -63,11 +42,12 @@ function todayDDMMYYYY() {
 
 export function usePrayerTimes() {
   const loc = useGeolocate();
+  const prayerEnabled = useSettings((s) => s.prayerEnabled);
   const method = useSettings((s) => s.prayerCalcMethod);
 
   return useQuery({
     queryKey: ["prayer-times", loc?.lat, loc?.lon, method, todayDDMMYYYY()],
-    enabled: !!loc,
+    enabled: prayerEnabled && !!loc,
     staleTime: 1000 * 60 * 30,
     queryFn: async () => {
       const url = `https://api.aladhan.com/v1/timings/${todayDDMMYYYY()}?latitude=${loc!.lat}&longitude=${loc!.lon}&method=${method}`;
