@@ -322,8 +322,13 @@ function ActionButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant={destructive ? "destructive" : "outline"}
-          className="h-auto w-full justify-between rounded-2xl border border-border bg-background px-4 py-3 text-left"
+          variant="outline"
+          className={[
+            "h-auto w-full justify-between rounded-2xl border px-4 py-3 text-left",
+            destructive
+              ? "border-destructive/60 bg-background text-destructive hover:bg-destructive/5"
+              : "border-border bg-background text-foreground hover:bg-accent",
+          ].join(" ")}
         >
           <span>
             <span className="block text-sm font-semibold">{title}</span>
