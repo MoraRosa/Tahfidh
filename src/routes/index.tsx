@@ -101,7 +101,7 @@ function Dashboard() {
       <header className="space-y-2">
         <div className="flex items-center gap-3">
           <img
-            src="/Logo.png"
+            src={`${import.meta.env.BASE_URL}Logo.png`}
             alt="Noor logo"
             className="h-10 w-10 rounded-2xl bg-white/80 object-contain shadow-sm ring-1 ring-primary/10"
           />
@@ -114,18 +114,11 @@ function Dashboard() {
           <blockquote className="font-display text-[15px] italic leading-snug text-foreground/90">
             “{quote.text}”
           </blockquote>
-          <figcaption className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">
-            <span className="rounded-full bg-primary/10 px-2 py-0.5">
-              {quote.kind === "verse"
-                ? "Verse"
-                : quote.kind === "hadith"
-                  ? "Hadith"
-                  : quote.kind === "prayer"
-                    ? "Prayer"
-                    : "Wisdom"}
-            </span>
-            {quote.source && <span>{quote.source}</span>}
-          </figcaption>
+          {quote.source && (
+            <figcaption className="mt-1 text-[11px] uppercase tracking-wide text-primary/80">
+              {quote.source}
+            </figcaption>
+          )}
         </figure>
       </header>
 
