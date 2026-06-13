@@ -67,22 +67,33 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const SHARE_IMAGE_URL = "https://morarosa.github.io/Tahfidh/icon-512.png";
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#d6336c" },
-      { title: "Noor — Quran Memorization" },
-      { name: "description", content: "Read, listen and memorize the Quran with cute, accessible tools." },
-      { name: "author", content: "Noor" },
-      { property: "og:title", content: "Noor — Quran Memorization" },
-      { property: "og:description", content: "Read, listen and memorize the Quran with cute, accessible tools." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Noor — Quran Memorization" },
-      { name: "twitter:description", content: "Read, listen and memorize the Quran with cute, accessible tools." },
-    ],
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+        { name: "theme-color", content: "#d6336c" },
+        { title: "Noor — Quran Memorization" },
+        { name: "description", content: "Read, listen and memorize the Quran with cute, accessible tools." },
+        { name: "author", content: "Noor" },
+        { property: "og:title", content: "Noor — Quran Memorization" },
+        { property: "og:description", content: "Read, listen and memorize the Quran with cute, accessible tools." },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://morarosa.github.io/Tahfidh/" },
+        { property: "og:site_name", content: "Noor" },
+        { property: "og:image", content: SHARE_IMAGE_URL },
+        { property: "og:image:width", content: "512" },
+        { property: "og:image:height", content: "512" },
+        { property: "og:image:alt", content: "Noor app preview" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: "Noor — Quran Memorization" },
+        { name: "twitter:description", content: "Read, listen and memorize the Quran with cute, accessible tools." },
+        { name: "twitter:image", content: SHARE_IMAGE_URL },
+        { name: "twitter:image:alt", content: "Noor app preview" },
+      ],
+
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: `${import.meta.env.BASE_URL}favicon.ico` },

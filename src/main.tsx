@@ -13,7 +13,9 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 
-registerSW({ immediate: true });
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  registerSW({ immediate: true });
+}
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
