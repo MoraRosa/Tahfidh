@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useSettings } from "@/stores/settings";
 import { TRANSLATIONS, TAFSIRS, LANGUAGE_LABELS } from "@/lib/quran/translations";
 import { RECITERS } from "@/lib/quran/reciters";
@@ -11,6 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -24,6 +37,69 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const s = useSettings();
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    const handleAppInstalled = () => {
+      setInstallPrompt(null);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) {
+      window.alert("Install is not available in this browser.");
+      return;
+    }
+
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  };
+
+  const handleHardRefresh = async () => {
+    if ("caches" in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+    }
+
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    }
+
+    window.location.reload();
+  };
+
+  const handleDeleteAllData = async () => {
+    useSettings.persist?.clearStorage();
+    localStorage.clear();
+    sessionStorage.clear();
+
+    if ("caches" in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+    }
+
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    }
+
+    window.location.reload();
+  };
 
   const translationGroups = Object.entries(
     TRANSLATIONS.reduce<Record<string, { value: string; label: string }[]>>((acc, t) => {
@@ -190,6 +266,34 @@ function SettingsPage() {
         />
       </Section>
 
+      <Section title="App tools">
+        <p className="text-sm text-muted-foreground">Install the app, force a full refresh, or wipe stored app data.</p>
+
+        <div className="grid gap-3">
+          <ActionButton
+            title="Install app"
+            description="Add Noor to your device for a faster, app-like experience."
+            onConfirm={handleInstall}
+            confirmLabel="Install"
+          />
+
+          <ActionButton
+            title="Hard refresh"
+            description="Clear cached assets and reload the app from scratch."
+            onConfirm={handleHardRefresh}
+            confirmLabel="Clear cache"
+          />
+
+          <ActionButton
+            title="Delete all data"
+            description="Clear saved settings and caches from this device."
+            onConfirm={handleDeleteAllData}
+            confirmLabel="Delete all"
+            destructive
+          />
+        </div>
+      </Section>
+
       <Section title="About">
         <p className="text-sm leading-relaxed text-muted-foreground">
           Noor is a private, client-side Quran app. All your progress is stored on this device only —
@@ -198,6 +302,52 @@ function SettingsPage() {
         </p>
       </Section>
     </div>
+  );
+}
+
+function ActionButton({
+  title,
+  description,
+  onConfirm,
+  confirmLabel,
+  destructive = false,
+}: {
+  title: string;
+  description: string;
+  onConfirm: () => void | Promise<void>;
+  confirmLabel: string;
+  destructive?: boolean;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant={destructive ? "destructive" : "outline"}
+          className="h-auto w-full justify-between rounded-2xl border border-border bg-background px-4 py-3 text-left"
+        >
+          <span>
+            <span className="block text-sm font-semibold">{title}</span>
+            <span className="block text-xs text-muted-foreground">{description}</span>
+          </span>
+          <span className="text-sm">→</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => void onConfirm()}
+            variant={destructive ? "destructive" : "default"}
+          >
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
