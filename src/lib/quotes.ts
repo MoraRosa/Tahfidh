@@ -1,6 +1,6 @@
 // One-liner rotation for the homepage. Add more freely — keep them short.
-// Types: "verse" (Quran), "hadith" (Prophet ﷺ), "wisdom" (general Islamic/positive)
-export type QuoteKind = "verse" | "hadith" | "wisdom";
+// Types: "verse" (Quran), "hadith" (Prophet ﷺ), "prayer" (du'a / supplication), "wisdom" (general Islamic/positive)
+export type QuoteKind = "verse" | "hadith" | "prayer" | "wisdom";
 export interface Quote {
   text: string;
   source?: string;
@@ -37,6 +37,18 @@ export const QUOTES: Quote[] = [
   { kind: "verse", text: "Do not despair of the mercy of Allah.", source: "Qur'an 39:53" },
   { kind: "verse", text: "And He taught you that which you did not know.", source: "Qur'an 4:113" },
   { kind: "verse", text: "Indeed, Allah loves those who rely upon Him.", source: "Qur'an 3:159" },
+
+  // ── Prayers / du'a ────────────────────────────────────
+  { kind: "prayer", text: "Our Lord, grant us good in this world and good in the Hereafter.", source: "Qur'an 2:201" },
+  { kind: "prayer", text: "My Lord, increase me in knowledge.", source: "Qur'an 20:114" },
+  { kind: "prayer", text: "Our Lord, do not burden us with more than we can bear.", source: "Qur'an 2:286" },
+  { kind: "prayer", text: "O Allah, make this day easy for me and bless me in it.", source: "Daily du'a" },
+  { kind: "prayer", text: "Allahumma inni a'udhu bika min al-hammi wal-hazan.", source: "Prophetic supplication" },
+  { kind: "prayer", text: "Allahumma barik lana fima razaqtana wa qina 'adhaban-nar.", source: "Prophetic supplication" },
+  { kind: "prayer", text: "Rabbi inni lima anzalta ilayya min khayrin faqir.", source: "Qur'an 28:24" },
+  { kind: "prayer", text: "Rabbi hab li min ladunka dhurriyyatan tayyibah.", source: "Qur'an 3:38" },
+  { kind: "prayer", text: "Allahumma salli 'ala Muhammad wa 'ala ali Muhammad.", source: "Salawat" },
+  { kind: "prayer", text: "SubhanAllah, alhamdulillah, Allahu Akbar.", source: "Dhikr" },
 
   // ── Hadith ─────────────────────────────────────────────
   { kind: "hadith", text: "The best among you are those who learn the Qur'an and teach it.", source: "Bukhari" },

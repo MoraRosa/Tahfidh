@@ -99,19 +99,33 @@ function Dashboard() {
   return (
     <div className="space-y-7">
       <header className="space-y-2">
-        <p className="text-sm font-medium text-primary">
-          Assalamu alaikum{userName ? `, ${userName}` : ""} 🌸
-        </p>
+        <div className="flex items-center gap-3">
+          <img
+            src="/Logo.png"
+            alt="Noor logo"
+            className="h-10 w-10 rounded-2xl bg-white/80 object-contain shadow-sm ring-1 ring-primary/10"
+          />
+          <p className="text-sm font-medium text-primary">
+            As-salamu alaikum{userName ? `, ${userName}` : ""}
+          </p>
+        </div>
         <h1 className="font-display text-3xl font-bold leading-tight">Your Quran journey</h1>
         <figure className="mt-2 rounded-2xl border-l-2 border-primary/60 bg-card/40 px-3 py-2">
           <blockquote className="font-display text-[15px] italic leading-snug text-foreground/90">
             “{quote.text}”
           </blockquote>
-          {quote.source && (
-            <figcaption className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-primary/80">
-              {quote.source}
-            </figcaption>
-          )}
+          <figcaption className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">
+            <span className="rounded-full bg-primary/10 px-2 py-0.5">
+              {quote.kind === "verse"
+                ? "Verse"
+                : quote.kind === "hadith"
+                  ? "Hadith"
+                  : quote.kind === "prayer"
+                    ? "Prayer"
+                    : "Wisdom"}
+            </span>
+            {quote.source && <span>{quote.source}</span>}
+          </figcaption>
         </figure>
       </header>
 
