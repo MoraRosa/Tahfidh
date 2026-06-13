@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Download, RefreshCw, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSettings } from "@/stores/settings";
 import { TRANSLATIONS, TAFSIRS, LANGUAGE_LABELS } from "@/lib/quran/translations";
@@ -24,6 +25,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -267,29 +273,30 @@ function SettingsPage() {
       </Section>
 
       <Section title="App tools">
-        <p className="text-sm text-muted-foreground">Install the app, force a full refresh, or wipe stored app data.</p>
-
-        <div className="grid gap-3">
+        <div className="flex w-full flex-wrap items-stretch gap-2">
           <ActionButton
             title="Install app"
             description="Add Noor to your device for a faster, app-like experience."
             onConfirm={handleInstall}
             confirmLabel="Install"
+            icon={<Download className="h-4 w-4" />}
           />
 
           <ActionButton
             title="Hard refresh"
-            description="Clear cached assets and reload the app from scratch."
+            description="Clear cached assets and reload from scratch."
             onConfirm={handleHardRefresh}
             confirmLabel="Clear cache"
+            icon={<RefreshCw className="h-4 w-4" />}
           />
 
           <ActionButton
             title="Delete all data"
-            description="Clear saved settings and caches from this device."
+            description="Clear saved settings and cached files from this device."
             onConfirm={handleDeleteAllData}
             confirmLabel="Delete all"
             destructive
+            icon={<Trash2 className="h-4 w-4" />}
           />
         </div>
       </Section>
@@ -311,30 +318,31 @@ function ActionButton({
   onConfirm,
   confirmLabel,
   destructive = false,
+  icon,
 }: {
   title: string;
   description: string;
   onConfirm: () => void | Promise<void>;
   confirmLabel: string;
   destructive?: boolean;
+  icon: React.ReactNode;
 }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
+          type="button"
           variant="outline"
+          aria-label={title}
+          title={title}
           className={[
-            "h-auto w-full justify-between rounded-2xl border px-4 py-3 text-left",
+            "flex min-h-11 flex-1 items-center justify-center rounded-xl border px-2 py-2",
             destructive
               ? "border-destructive/60 bg-background text-destructive hover:bg-destructive/5"
               : "border-border bg-background text-foreground hover:bg-accent",
           ].join(" ")}
         >
-          <span>
-            <span className="block text-sm font-semibold">{title}</span>
-            <span className="block text-xs text-muted-foreground">{description}</span>
-          </span>
-          <span className="text-sm">→</span>
+          {icon}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -346,7 +354,7 @@ function ActionButton({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => void onConfirm()}
-            variant={destructive ? "destructive" : "default"}
+            className={destructive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
           >
             {confirmLabel}
           </AlertDialogAction>
