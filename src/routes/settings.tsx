@@ -44,6 +44,10 @@ export const Route = createFileRoute("/settings")({
 function SettingsPage() {
   const s = useSettings();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const isStandalone =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone));
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -65,8 +69,15 @@ function SettingsPage() {
   }, []);
 
   const handleInstall = async () => {
+    if (isStandalone) {
+      window.alert("This app is already installed on this device.");
+      return;
+    }
+
     if (!installPrompt) {
-      window.alert("Install is not available in this browser.");
+      window.alert(
+        "The install prompt is not available in this browser session right now. On Android, use Chrome’s menu → Install app. On iPhone/iPad, use Share → Add to Home Screen.",
+      );
       return;
     }
 

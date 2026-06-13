@@ -255,8 +255,16 @@ function SurahReader() {
                 else verseRefs.current.delete(v.ayah);
               }}
             >
-              <button
+              <article
                 onClick={() => handleVerseTap(v.ayah)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleVerseTap(v.ayah);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
                 className={`w-full rounded-3xl border bg-card p-4 text-left transition-all ${
                   isPlaying
                     ? "border-primary bg-primary/5 ring-2 ring-primary shadow-[var(--shadow-soft)]"
@@ -321,7 +329,7 @@ function SurahReader() {
                     {translation ?? (transQ.isLoading ? "…" : "")}
                   </p>
                 )}
-              </button>
+              </article>
             </li>
           );
         })}
